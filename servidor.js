@@ -8,7 +8,8 @@ const PORT = 3000; // Puerto donde correrá el servidor
 app.use(express.static("public"))
 
 //Esta es la página principal
-app.get("/", (req, res) => { res.send("¡Hola, Express!"); });
+app.get("/", (req, res) => { res.sendFile(path.join(__dirname,"public","principal.html")); });
+
 // Esta es la primer página
 app.get("/primera", (req, res) => {
   res.sendFile(path.join(__dirname,"public","primer","index.html"));
@@ -16,7 +17,7 @@ app.get("/primera", (req, res) => {
 
 //Esta es la segunda página
 app.get("/segunda", (req, res) => {
-  res.sendFile(path.join(__dirname,"public","Segunda-página","index.html"));
+  res.sendFile(path.join(__dirname,"public","segunda","index.html"));
 });
 
 // Iniciar el servidor
