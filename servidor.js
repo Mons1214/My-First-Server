@@ -1,11 +1,19 @@
 const express = require("express");
 const path = require("path")
-const app = express();
 
+const app = express();
 const PORT = 3000; // Puerto donde correrá el servidor
 
 
-app.use(express.static("public"))
+//Esta funcion consologuea la fecha, la hora, el metodo y la url
+const logger = (req, res, next) => {
+  console.log(`${new Date().toISOString()} ${req.method} ${req.url}`)
+  next()//Next nos indica  que ya termino y puede continuar con lo siguiente
+}
+
+//Vuelve los archivos estaticos y permite utilizarlos
+app.use(express.static("public")) 
+app.use(logger)
 
 //Esta es la página principal
 app.get("/", (req, res) => { res.sendFile(path.join(__dirname,"public","principal.html")); });
