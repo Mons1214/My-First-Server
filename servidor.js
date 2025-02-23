@@ -8,34 +8,42 @@ const PORT = 3000; // Puerto donde correrá el servidor
 
 //Esta funcion consologuea la fecha, la hora, el metodo y la url
 const logger = (req, res, next) => {
-  const logEntry = {
-    timeStamp: new Date().toISOString(),
-    method: req.method,
-    url: req.url 
-  };
 
-  fs.readFile("log.json", "utf8", (err, data) =>  {
-   
-    let logs = []
-    if(!err && data ){
-      logs = JSON.parse(data)
+  const staticExtensions = ['.css', '.js'];
+
+  const ext = path.extname(req.url);
+
+  if (!staticExtensions.includes(ext)) {
+    const logEntry = {
+      timeStamp: new Date().toISOString(),
+      method: req.method,
+      url: req.url
     };
+
+    fs.readFile("log.json", "utf8", (err, data) =>  {
   
-    logs.push(logEntry)
-    
-    //fileSistem
-    fs.writeFile("log.json", JSON.stringify(logs, null, 2), (err) => {
-      if(err){
-        console.log("error en guardar el archivo log.json")
+      let logs = []
+      if(!err && data ){
+        logs = JSON.parse(data)
       };
+    
+      logs.push(logEntry)
+      
+      //fileSistem
+      fs.writeFile("log.json", JSON.stringify(logs, null, 2), (err) => {
+        if(err){
+          console.log("error en guardar el archivo log.json")
+        };
+      });
     });
-  });
+  }
+  
   next()//Next nos indica  que ya termino y puede continuar con lo siguiente
 };
 
+app.use(logger)
 //Vuelve los archivos estaticos y permite utilizarlos
 app.use(express.static("public")) 
-app.use(logger)
 
 //Esta es la página principal
 app.get("/", (req, res) => { res.sendFile(path.join(__dirname,"public","principal.html")); });
@@ -46,9 +54,10 @@ app.get("/primera", (req, res) => {
 });
 
 //Esta es la segunda página
-app.get("/segunda", (req, res) => {
+app.get("/two", (req, res) => {
   res.sendFile(path.join(__dirname,"public","segunda","index.html"));
 });
+
 
 // Iniciar el servidor
 app.listen(PORT, () => {
