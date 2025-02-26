@@ -6,40 +6,48 @@ const app = express();
 const PORT = 3000; // Puerto donde correrá el servidor
 
 
-//Esta funcion consologuea la fecha, la hora, el metodo y la url
+// Función para obtener el nombre del archivo de log del día actual
+const getLogFileName = () => {
+  const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  return `log-${date}.json`;
+};
+
+// Middleware de logging
 const logger = (req, res, next) => {
-
   const staticExtensions = ['.css', '.js'];
-
   const ext = path.extname(req.url);
-
+  
   if (!staticExtensions.includes(ext)) {
     const logEntry = {
       timeStamp: new Date().toISOString(),
       method: req.method,
       url: req.url
     };
-
-    fs.readFile("log.json", "utf8", (err, data) =>  {
-  
-      let logs = []
-      if(!err && data ){
-        logs = JSON.parse(data)
-      };
     
-      logs.push(logEntry)
+    const logFileName = getLogFileName();
+    
+    fs.readFile(logFileName, "utf8", (err, data) => {
+      let logs = [];
+      if (!err && data) {
+        try {
+          logs = JSON.parse(data);
+        } catch (parseError) {
+          console.error("Error parsing log file", parseError);
+        }
+      }
       
-      //fileSistem
-      fs.writeFile("log.json", JSON.stringify(logs, null, 2), (err) => {
-        if(err){
-          console.log("error en guardar el archivo log.json")
-        };
+      logs.push(logEntry);
+      
+      fs.writeFile(logFileName, JSON.stringify(logs, null, 2), (err) => {
+        if (err) {
+          console.error("Error al guardar el archivo de log", err);
+        }
       });
     });
   }
-  
-  next()//Next nos indica  que ya termino y puede continuar con lo siguiente
+  next();
 };
+
 
 app.use(logger)
 //Vuelve los archivos estaticos y permite utilizarlos
