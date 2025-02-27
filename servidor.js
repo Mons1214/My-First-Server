@@ -5,6 +5,7 @@ const fs = require("fs");
 const app = express();
 const PORT = 3000; // Puerto donde correrá el servidor
 
+const visitCounts = {};
 
 // Función para obtener el nombre del archivo de log del día actual
 const getLogFileName = () => {
@@ -18,6 +19,12 @@ const logger = (req, res, next) => {
   const ext = path.extname(req.url);
   
   if (!staticExtensions.includes(ext)) {
+    // Incrementamos el contador de visitas de la ruta
+    visitCounts[req.url] = (visitCounts[req.url] || 0) + 1;
+
+    // Mostramos en consola la ruta y el número de visitas
+    console.log(`Ruta: ${req.url}, Visitas: ${visitCounts[req.url]}`);
+
     const logEntry = {
       timeStamp: new Date().toISOString(),
       method: req.method,
